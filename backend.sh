@@ -1,50 +1,31 @@
+echo "Disabling default nodejs Version Module"
+dnf module disable nodejs -y &>>$LOG_FILE
+check_status "Disable nodejs module"
 
-echo Disable default nodejs Version Module
-dnf module disable nodejs -y &>/tmp/expense.log
-dnf module enable nodejs:20 -y &>/tmp/expense.log
-echo$?
+echo "Enabling nodejs:20"
+dnf module enable nodejs:20 -y &>>$LOG_FILE
+check_status "Enable nodejs:20"
 
-echo Install Nodejs
-dnf install nodejs -y &>/tmp/expense.log
-echo$?
+echo "Installing Nodejs"
+dnf install nodejs -y &>>$LOG_FILE
+check_status "Install nodejs"
 
-echo Adding Application User
-useradd expense &>/tmp/expense.log
-echo$?
+echo "Adding Application User"
+useradd expense &>>$LOG_FILE
+check_status "Add expense user"
 
-echo copy Backend Service file
-cp Backend.service /etc/systemd/system/backend.service &>/tmp/expense.log
-echo$?
+echo "Copying Backend Service file"
+cp backend.service /etc/systemd/system/backend.service &>>$LOG_FILE
+check_status "Copy backend.service"
 
-echo Clean up the old content
-rm -rf/app &>/tmp/expense.log
-echo$?
+echo "Cleaning up old content"
+rm -rf /app/* &>>$LOG_FILE
+check_status "Clean /app"
 
-echo Create App Directory
-mkdir /app &>/tmp/expense.log
-echo$?
+echo "Creating App Directory"
+mkdir -p /app &>>$LOG_FILE
+check_status "Create /app"
 
-echo Download App Content
-curl -o /tmp/backend.zip https://expense-artifacts.s3.amazonaws.com/expense-backend-v2.zip &>/tmp/expense.log
-echo$?
-
-echo Extract App Content
-cd /app &>/tmp/expense.log
-unzip /tmp/backend.zip &>/tmp/expense.log
-echo$?
-
-echo Download Nodejs Dependencies
-cd /app &>/tmp/expense.log
-npm install &>/tmp/expense.log
-echo$?
-
-echo enable-start backend
-systemctl daemon-reload &>/tmp/expense.log
-systemctl enable backend &>/tmp/expense.log
-systemctl start backend &>/tmp/expense.log
-echo$?
-
-echo Install mysql
-dnf install mysql -y &>/tmp/expense.log
-mysql -h 172.31.40.213 -uroot -pExpenseApp@1 < /app/schema/backend.sql
-echo$?
+echo "Downloading App Content"
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/backend-v2.zip &>>$LOG_FILE
+check_status "Download app content"
