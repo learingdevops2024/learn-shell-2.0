@@ -1,31 +1,27 @@
+LOG_FILE="/tmp/expense.log"
+
 echo "Disabling default nodejs Version Module"
-dnf module disable nodejs -y &>/tmp/expense.log
-check_status "Disable nodejs module"
+dnf module disable nodejs -y &>> "$LOG_FILE"
+if [ $? -ne 0 ]; then echo "FAILED: Disable nodejs module"; exit 1; fi
+echo "SUCCESS: Disable nodejs module"
 
 echo "Enabling nodejs:20"
-dnf module enable nodejs:20 -y &>/tmp/expense.log
-check_status "Enable nodejs:20"
+dnf module enable nodejs:20 -y &>> "$LOG_FILE"
+if [ $? -ne 0 ]; then echo "FAILED: Enable nodejs:20"; exit 1; fi
+echo "SUCCESS: Enable nodejs:20"
 
 echo "Installing Nodejs"
-dnf install nodejs -y &>/tmp/expense.log
-check_status "Install nodejs"
+dnf install nodejs -y &>> "$LOG_FILE"
+if [ $? -ne 0 ]; then echo "FAILED: Install nodejs"; exit 1; fi
+echo "SUCCESS: Install nodejs"
 
 echo "Adding Application User"
-useradd expense &>/tmp/expense.log
-check_status "Add expense user"
+useradd expense &>> "$LOG_FILE"
+# Check if user already exists (grep returns 0 if found)
+if [ $? -ne 0 ]; then echo "FAILED: Add expense user"; exit 1; fi
+echo "SUCCESS: Add expense user"
 
 echo "Copying Backend Service file"
-cp backend.service /etc/systemd/system/backend.service &>/tmp/expense.log
-check_status "Copy backend.service"
-
-echo "Cleaning up old content"
-rm -rf /app/* &>/tmp/expense.log
-check_status "Clean /app"
-
-echo "Creating App Directory"
-mkdir -p /app &>/tmp/expense.log
-check_status "Create /app"
-
-echo "Downloading App Content"
-curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/backend-v2.zip&>/tmp/expense.log
-check_status "Download app content"
+cp backend.service /etc/systemd/system/backend.service &>> "$LOG_FILE"
+if [ $? -ne 0 ]; then echo "FAILED: Copy backend.service"; exit 1; fi
+echo "SUCCESS: Copy backend.service"
