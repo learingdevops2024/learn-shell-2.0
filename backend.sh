@@ -1,27 +1,22 @@
 LOG_FILE="/tmp/expense.log"
 
 echo "Disabling default nodejs Version Module"
-dnf module disable nodejs -y &>> "$LOG_FILE"
-if [ $? -ne 0 ]; then echo "FAILED: Disable nodejs module"; exit 1; fi
-echo "SUCCESS: Disable nodejs module"
+dnf module disable nodejs -y &>>$LOG_FILE
+check_status $?
 
 echo "Enabling nodejs:20"
 dnf module enable nodejs:20 -y &>> "$LOG_FILE"
-if [ $? -ne 0 ]; then echo "FAILED: Enable nodejs:20"; exit 1; fi
-echo "SUCCESS: Enable nodejs:20"
+check_status $?
 
 echo "Installing Nodejs"
 dnf install nodejs -y &>> "$LOG_FILE"
-if [ $? -ne 0 ]; then echo "FAILED: Install nodejs"; exit 1; fi
-echo "SUCCESS: Install nodejs"
+check_status $?
 
 echo "Adding Application User"
 useradd expense &>> "$LOG_FILE"
 # Check if user already exists (grep returns 0 if found)
-if [ $? -ne 0 ]; then echo "FAILED: Add expense user"; exit 1; fi
-echo "SUCCESS: Add expense user"
+check_status $?
 
 echo "Copying Backend Service file"
 cp backend.service /etc/systemd/system/backend.service &>> "$LOG_FILE"
-if [ $? -ne 0 ]; then echo "FAILED: Copy backend.service"; exit 1; fi
-echo "SUCCESS: Copy backend.service"
+check_status $?
