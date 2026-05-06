@@ -1,4 +1,4 @@
-source common.sh
+source ./common.sh
 echo "Disable default nodejs Version Module"
 dnf module disable nodejs -y &>/tmp/expense.log
 dnf module enable nodejs:20 -y &>/tmp/expense.log
