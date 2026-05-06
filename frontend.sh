@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ./common.sh
 app_dir=/usr/share/nginx/html
 component=frontend

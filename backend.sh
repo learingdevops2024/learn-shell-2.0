@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ./common.sh
 echo "Disable default nodejs Version Module"
 dnf module disable nodejs -y &>/tmp/expense.log
