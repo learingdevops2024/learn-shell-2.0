@@ -4,7 +4,7 @@ component=frontend
 
 Print_Task_Heading "install nginx"
 dnf install nginx -y &>>$LOG_FILE
-Chck_Status $?
+Check_Status $?
 
 Print_Task_Heading "Copy Expence Nginx File"
 cp expence.conf /etc/nginx/default.d/expence.conf &>>$LOG_FILE
