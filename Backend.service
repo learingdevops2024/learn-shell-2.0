@@ -3,7 +3,7 @@ Description = Backend Service
 
 [Service]
 User=expense
-Environment=DB_HOST= "54.198.149.54"
+Environment=DB_HOST= "3.85.113.245"
 ExecStart=/bin/node /app/index.js
 SyslogIdentifier=backend
 
