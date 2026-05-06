@@ -1,55 +1,38 @@
-source common.sh
+echo "Disable default nodejs Version Module"
+dnf module disable nodejs -y &>/tmp/expense.log
+dnf module enable nodejs:20 -y &>/tmp/expense.log
+echo $?
 
-mysql_root_password=$1
-app_dir=/app
-component=backend
+echo "Install Nodejs"
+dnf install nodejs -y &>/tmp/expense.log
+echo $?
 
-# If password is not provided then we will exit
-if [ -z "${mysql_root_password}" ]; then
-  echo Input Password is missing.
-  exit 1
-fi
+echo "Adding Application User"
+id expense || useradd expense &>/tmp/expense.log
+echo $?
 
-Print_Task_Heading "Disable default NodeJS Version Module"
-dnf module disable nodejs -y &>>$LOG_FILE
-Check_Status $?
+echo "copy Backend Service file"
+cp Backend.service /etc/systemd/system/backend.service &>/tmp/expense.log
+echo $?
 
-Print_Task_Heading "Enable NodeJS module for V20"
-dnf module enable nodejs:20 -y &>>$LOG_FILE
-Check_Status $?
+echo "Clean up the old content"
+rm -rf /app &>/tmp/expense.log
+echo $?
 
-Print_Task_Heading "Install NodeJS"
-dnf install nodejs -y &>>$LOG_FILE
-Check_Status $?
+echo "Create App Directory"
+mkdir /app &>/tmp/expense.log
+echo $?
 
-Print_Task_Heading "Adding Application User"
-id expense &>>$LOG_FILE
-if [ $? -ne 0 ]; then
-  useradd expense &>>$LOG_FILE
-fi
-Check_Status $?
+echo "Download App Content"
+curl -o /tmp/backend.zip https://expense-artifacts.s3.amazonaws.com/expense-backend-v2.zip &>/tmp/expense.log
+echo $?
 
-Print_Task_Heading "Copy Backend Service file"
-cp backend.service /etc/systemd/system/backend.service &>>$LOG_FILE
-Check_Status $?
+echo "Extract App Content"
+cd /app
+unzip /tmp/backend.zip &>/tmp/expense.log
+echo $?
 
-App_PreReq
-
-Print_Task_Heading "Download NodeJS Dependencies"
-cd /app &>>$LOG_FILE
-npm install &>>$LOG_FILE
-Check_Status $?
-
-Print_Task_Heading "Start Backend Service"
-systemctl daemon-reload &>>$LOG_FILE
-systemctl enable backend &>>$LOG_FILE
-systemctl start backend &>>$LOG_FILE
-Check_Status $?
-
-Print_Task_Heading "Install MySQL Client"
-dnf install mysql -y &>>$LOG_FILE
-Check_Status $?
-
-Print_Task_Heading "Load Schema"
-mysql -h mysql-dev.rdevops6a.online -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG_FILE
-Check_Status $?
+echo "Download Nodejs Dependencies"
+cd /app
+npm install &>/tmp/expense.log
+echo $?
