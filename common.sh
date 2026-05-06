@@ -5,6 +5,7 @@ Check_Status() {
     echo SUCCESS
   else
     echo FAIL
+    exit 2
   fi
 }
 App_PreReq() {
