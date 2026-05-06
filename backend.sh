@@ -1,6 +1,5 @@
 source common.sh
 
-
 mysql_root_password=$1
 app_dir=/app
 component=backend
@@ -12,45 +11,45 @@ if [ -z "${mysql_root_password}" ]; then
 fi
 
 Print_Task_Heading "Disable default NodeJS Version Module"
-dnf module disable nodejs -y &>>$LOG
+dnf module disable nodejs -y &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Enable NodeJS module for V20"
-dnf module enable nodejs:20 -y &>>$LOG
+dnf module enable nodejs:20 -y &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Install NodeJS"
-dnf install nodejs -y &>>$LOG
+dnf install nodejs -y &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Adding Application User"
-id expense &>>$LOG
+id expense &>>$LOG_FILE
 if [ $? -ne 0 ]; then
-  useradd expense &>>$LOG
+  useradd expense &>>$LOG_FILE
 fi
 Check_Status $?
 
 Print_Task_Heading "Copy Backend Service file"
-cp backend.service /etc/systemd/system/backend.service &>>$LOG
+cp backend.service /etc/systemd/system/backend.service &>>$LOG_FILE
 Check_Status $?
 
 App_PreReq
 
 Print_Task_Heading "Download NodeJS Dependencies"
-cd /app &>>$LOG
-npm install &>>$LOG
+cd /app &>>$LOG_FILE
+npm install &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Start Backend Service"
-systemctl daemon-reload &>>$LOG
-systemctl enable backend &>>$LOG
-systemctl start backend &>>$LOG
+systemctl daemon-reload &>>$LOG_FILE
+systemctl enable backend &>>$LOG_FILE
+systemctl start backend &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Install MySQL Client"
-dnf install mysql -y &>>$LOG
+dnf install mysql -y &>>$LOG_FILE
 Check_Status $?
 
 Print_Task_Heading "Load Schema"
-mysql -h mysql-dev.rdevops6a.online -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG
+mysql -h mysql-dev.rdevops6a.online -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG_FILE
 Check_Status $?
